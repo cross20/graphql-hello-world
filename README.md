@@ -27,4 +27,6 @@ Navigate to the directory with [manage.py](manage.py) then run the server.
 
 `python manage.py runserver`
 
+`python manage.py migrate`
+
 From a web browser, open [localhost:8000/graphql](http://localhost:8000/graphql).
