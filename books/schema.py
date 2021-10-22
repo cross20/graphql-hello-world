@@ -1,5 +1,4 @@
 import graphene
-from graphene.types.scalars import String
 from graphene_django import DjangoObjectType
 from .models import Books
 
@@ -12,6 +11,6 @@ class Query(graphene.ObjectType):
     all_books = graphene.List(BooksType)
 
     def resolve_all_books(root, info):
-        return Books.objects.filter(title="Yo Mama")
+        return Books.objects.all()
 
 schema = graphene.Schema(query=Query)
