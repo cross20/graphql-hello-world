@@ -14,6 +14,8 @@ Using a virutal environment is recommended. Use these commands to activate one.
 
 `venv\Scripts\activate`
 
+Once activated, install the requirements below.
+
 ## Reqirements
 
 - Python
@@ -23,10 +25,10 @@ Learn about [GraphQL](https://graphql.org/learn/) and its [supported languages](
 
 ## Running the Program
 
-Navigate to the directory with [manage.py](manage.py) then run the server.
-
-`python manage.py runserver`
+Navigate to the directory with [manage.py](manage.py). Activate your virtual environment (if applicable) and run the server.
 
 `python manage.py migrate`
 
-From a web browser, open [localhost:8000/graphql](http://localhost:8000/graphql).
+`python manage.py runserver`
+
+From a web browser, open [localhost:8000/books](http://localhost:8000/books) or [localhost:8000/quiz](http://localhost:8000/quiz).
