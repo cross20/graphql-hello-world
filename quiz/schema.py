@@ -1,8 +1,8 @@
 import graphene
-from graphene.types.structures import List
-from graphene_django import DjangoObjectType, DjangoListField
+from graphene_django import DjangoObjectType
 from .models import Quizzes, Category, Question, Answer
 
+# Querys
 class CategoryType(DjangoObjectType):
     class Meta:
         model = Category
@@ -37,4 +37,49 @@ class Query(graphene.ObjectType):
         # filter allows multiple return values
         return Answer.objects.filter(question=id)
 
-schema = graphene.Schema(query=Query)
+# Mutations
+class NewCategoryMutation(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls, root, info, name):
+        category = Category(name=name) # create new category
+        category.save()
+        return NewCategoryMutation(category=category)
+
+class UpdateCategoryMutation(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls, root, info, id, name):
+        category = Category.objects.get(id=id)
+        category.name = name # update name of category
+        category.save()
+        return UpdateCategoryMutation(category=category)
+
+class DeleteCategoryMutation(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        category = Category.objects.get(id=id)
+        category.delete()
+        return
+
+class Mutation(graphene.ObjectType):
+    new_category = NewCategoryMutation.Field()
+    update_category = UpdateCategoryMutation.Field()
+    delete_category = DeleteCategoryMutation.Field()
+
+# CRUD (Create, Read, Update, Delete)
+schema = graphene.Schema(query=Query, mutation=Mutation)
