@@ -1,4 +1,5 @@
 import graphene
+from graphene.types.structures import List
 from graphene_django import DjangoObjectType, DjangoListField
 from .models import Quizzes, Category, Question, Answer
 
@@ -15,7 +16,7 @@ class QuizzesType(DjangoObjectType):
 class QuestionType(DjangoObjectType):
     class Meta:
         model = Question
-        fields = ("title", "quiz")
+        fields = ("id", "title", "quiz")
 
 class AnswerType(DjangoObjectType):
     class Meta:
@@ -23,13 +24,17 @@ class AnswerType(DjangoObjectType):
         fields = ("question", "answer_text")
 
 class Query(graphene.ObjectType):
-    all_quizzes = graphene.List(QuizzesType)
-    all_questions = graphene.List(QuestionType)
+    # field allows one return value
+    all_questions = graphene.Field(QuestionType, id=graphene.Int())
+    # list allows multiple return values
+    all_answers = graphene.List(AnswerType, id=graphene.Int())
 
-    def resolve_all_quizzes(root, info):
-        return Quizzes.objects.all()
-    
-    def resolve_all_questions(root, info):
-        return Question.objects.all()
+    def resolve_all_questions(root, info, id):
+        # get allows one return value
+        return Question.objects.get(pk=id)
+
+    def resolve_all_answers(root, info, id):
+        # filter allows multiple return values
+        return Answer.objects.filter(question=id)
 
 schema = graphene.Schema(query=Query)
