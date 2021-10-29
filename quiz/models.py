@@ -2,12 +2,20 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class Category(models.Model):
+    class Meta:
+        verbose_name = "category"
+        verbose_name_plural = "categories"
+
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
-class Quizzes(models.Model):
+class Quiz(models.Model):
+    class Meta:
+        verbose_name = "quiz"
+        verbose_name_plural = "quizzes"
+
     title = models.CharField(max_length=255, default=_("New Quiz"))
     category = models.ForeignKey(Category, default=1, on_delete=models.DO_NOTHING)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -16,6 +24,10 @@ class Quizzes(models.Model):
         return self.title
 
 class Question(models.Model):
+    class Meta:
+        verbose_name = "question"
+        verbose_name_plural = "questions"
+
     SCALE = [
         (0, _('Fundamental')),
         (1, _('Beginner')),
@@ -28,7 +40,7 @@ class Question(models.Model):
         (0, _('Multiple Choice'))
     ]
 
-    quiz = models.ForeignKey(Quizzes, related_name='question', on_delete=models.DO_NOTHING)
+    quiz = models.ForeignKey(Quiz, related_name='question', on_delete=models.DO_NOTHING)
     technique = models.IntegerField(choices=TYPE, default=0, verbose_name=_("Type of Question"))
     title = models.CharField(max_length=255, verbose_name=_("Title"))
     difficulty = models.IntegerField(choices=SCALE, default=0, verbose_name=_("Difficulty"))
@@ -39,6 +51,10 @@ class Question(models.Model):
         return self.title
 
 class Answer(models.Model):
+    class Meta:
+        verbose_name = "answer"
+        verbose_name_plural = "answers"
+
     question = models.ForeignKey(Question, related_name='answer', on_delete=models.DO_NOTHING)
     answer_text = models.CharField(max_length=255, verbose_name=_("Answer Text"))
     is_right = models.BooleanField(default=False)

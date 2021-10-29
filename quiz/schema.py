@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Quizzes, Category, Question, Answer
+from .models import Quiz, Category, Question, Answer
 
 # Querys
 class CategoryType(DjangoObjectType):
@@ -8,9 +8,9 @@ class CategoryType(DjangoObjectType):
         model = Category
         fields = ("id", "name")
 
-class QuizzesType(DjangoObjectType):
+class QuizType(DjangoObjectType):
     class Meta:
-        model = Quizzes
+        model = Quiz
         fields = ("id", "title", "category", "date_created")
 
 class QuestionType(DjangoObjectType):
@@ -27,11 +27,11 @@ class Query(graphene.ObjectType):
     # field allows one return value
     category = graphene.Field(CategoryType, id=graphene.Int())
     # field allows one return value
-    quiz = graphene.Field(QuizzesType, id=graphene.Int())
+    quiz = graphene.Field(QuizType, id=graphene.Int())
     # field allows one return value
     question = graphene.Field(QuestionType, id=graphene.Int())
     # list allows multiple return values
-    question_answers = graphene.List(AnswerType, questionId=graphene.Int())
+    answer = graphene.List(AnswerType, questionId=graphene.Int())
 
     def resolve_category(root, info, id):
         # get allows one return value
@@ -39,13 +39,13 @@ class Query(graphene.ObjectType):
 
     def resolve_quiz(root, info, id):
         # get allows one return value
-        return Quizzes.objects.get(pk=id)
+        return Quiz.objects.get(pk=id)
 
     def resolve_question(root, info, id):
         # get allows one return value
         return Question.objects.get(pk=id)
 
-    def resolve_question_answers(root, info, questionId):
+    def resolve_answer(root, info, questionId):
         # filter allows multiple return values
         return Answer.objects.filter(question=questionId)
 
@@ -65,14 +65,13 @@ class NewCategoryMutation(graphene.Mutation):
 class NewQuizMutation(graphene.Mutation):
     class Arguments:
         title = graphene.String(required=True)
-        #category = graphene.InputObjectType(Category) # TODO: implement category
-        date_created = graphene.DateTime(required=True)
+        categoryPk = graphene.Int(required=True)
 
-    quiz = graphene.Field(QuizzesType)
+    quiz = graphene.Field(QuizType)
 
     @classmethod
-    def mutate(cls, root, info, title, date_created): # TODO: implement category
-        quiz = Quizzes(title=title, date_created=date_created)
+    def mutate(cls, root, info, title, categoryPk):
+        quiz = Quiz(title=title, category=Category.objects.get(pk=categoryPk))
         quiz.save()
         return NewQuizMutation(quiz=quiz)
 
@@ -90,6 +89,22 @@ class UpdateCategoryMutation(graphene.Mutation):
         category.save()
         return UpdateCategoryMutation(category=category)
 
+class UpdateQuizMutation(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+        title = graphene.String(required=False)
+        categoryPk = graphene.Int(required=False)
+
+    quiz = graphene.Field(QuizType)
+
+    @classmethod
+    def mutate(cls, root, info, id, **kwargs):
+        quiz = Quiz.objects.get(id=id)
+        quiz.title = kwargs.get('title', quiz.title)
+        quiz.category = Category.objects.get(pk=kwargs.get('categoryPk', quiz.category.id))
+        quiz.save()
+        return UpdateQuizMutation(quiz=quiz)
+
 class DeleteCategoryMutation(graphene.Mutation):
     class Arguments:
         id = graphene.ID()
@@ -102,11 +117,25 @@ class DeleteCategoryMutation(graphene.Mutation):
         category.delete()
         return
 
+class DeleteQuizMutation(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    quiz = graphene.Field(QuizType)
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        quiz = Quiz.objects.get(id=id)
+        quiz.delete()
+        return
+
 class Mutation(graphene.ObjectType):
     new_category = NewCategoryMutation.Field()
     new_quiz = NewQuizMutation.Field()
     update_category = UpdateCategoryMutation.Field()
+    update_quiz = UpdateQuizMutation.Field()
     delete_category = DeleteCategoryMutation.Field()
+    delete_quiz = DeleteQuizMutation.Field()
 
 # CRUD (Create, Read, Update, Delete)
 schema = graphene.Schema(query=Query, mutation=Mutation)
