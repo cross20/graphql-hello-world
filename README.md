@@ -4,31 +4,34 @@ A simple Hello World project for learning about GraphQL.
 
 Based on the Very Academy "[GraphQL](https://www.youtube.com/watch?v=kP7wQoFXUSc&list=PLOLrQ9Pn6caxz00JcLeOR-Rtq0Yi01oBH)" tourorial.
 
-# Quick Start Guide
+# Setup
+
+## Prerequisites
+
+Python must be installed to complete setup.
 
 ## Virtual Environment
 
-Using a virutal environment is recommended. Use these commands to activate one.
+Using a virutal environment is recommended.
 
 `python -m venv venv`
 
 `venv\Scripts\activate`
 
-Once activated, install the requirements below.
+## Installation
 
-## Reqirements
+The required packages are in the [requirements.txt](requirements.txt) file.
 
-- Python
-- Graphene-Django
+`pip install -r requirements.txt`
 
-Learn about [GraphQL](https://graphql.org/learn/) and its [supported languages](https://graphql.org/code/) or get started with [Graphene-Django](https://docs.graphene-python.org/projects/django/en/latest/installation/).
+# Running the Program
 
-## Running the Program
+1. Navigate to the directory with [manage.py](manage.py).
+2. Activate the virtual environment (if applicable).
+3. Migrate and run the sever.
 
-Navigate to the directory with [manage.py](manage.py). Activate your virtual environment (if applicable) and run the server.
+    `python manage.py migrate`
 
-`python manage.py migrate`
+    `python manage.py runserver`
 
-`python manage.py runserver`
-
-From a web browser, open [localhost:8000/books](http://localhost:8000/books) or [localhost:8000/quiz](http://localhost:8000/quiz).
+4. From a web browser, open [localhost:8000/books](http://localhost:8000/books), [localhost:8000/quiz](http://localhost:8000/quiz), or [localhost:8000/users](http://localhost:8000/users).
